@@ -1,0 +1,163 @@
+# =============================================================================
+# ScaleCast Configuration
+# =============================================================================
+# Central configuration file for the MLOps pipeline
+# Environment variables can override these values using ${VAR_NAME} syntax
+# =============================================================================
+
+# =============================================================================
+# Data Configuration
+# =============================================================================
+data:
+  # Local paths (relative to project root)
+  raw_path: "data/raw"
+  processed_path: "data/processed"
+
+  # S3 configuration (uses environment variables)
+  s3_bucket: "${S3_BUCKET_NAME}"
+  s3_prefix: "scalecast"
+
+  # Data file patterns
+  file_patterns:
+    raw: "*.csv"
+    processed: "*.parquet"
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  host: "${POSTGRES_HOST:-localhost}"
+  port: ${POSTGRES_PORT:-5432}
+  database: "${POSTGRES_DB:-scalecast}"
+  schema: "public"
+
+  # Connection pool settings
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+model:
+  name: "demand_forecaster"
+  version: "1.0.0"
+
+  # Feature columns for training
+  features:
+    - "day_of_week"
+    - "month"
+    - "year"
+    - "is_holiday"
+    - "is_weekend"
+    - "lag_1"
+    - "lag_7"
+    - "lag_30"
+    - "rolling_mean_7"
+    - "rolling_mean_30"
+    - "rolling_std_7"
+    - "price"
+    - "promotion_active"
+
+  # Target column
+  target: "demand"
+
+  # Training parameters
+  training:
+    test_size: 0.2
+    random_state: 42
+    cv_folds: 5
+
+  # Model hyperparameters (default values)
+  hyperparameters:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+
+# =============================================================================
+# API Configuration
+# =============================================================================
+api:
+  host: "${API_HOST:-0.0.0.0}"
+  port: ${API_PORT:-8000}
+
+  # API settings
+  title: "ScaleCast API"
+  description: "Demand Forecasting API"
+  version: "1.0.0"
+
+  # Rate limiting
+  rate_limit:
+    requests_per_minute: 100
+    burst_size: 20
+
+  # CORS settings
+  cors:
+    allow_origins:
+      - "*"
+    allow_methods:
+      - "GET"
+      - "POST"
+    allow_headers:
+      - "*"
+
+# =============================================================================
+# MLflow Configuration
+# =============================================================================
+mlflow:
+  tracking_uri: "${MLFLOW_TRACKING_URI:-http://localhost:5000}"
+  experiment_name: "scalecast-demand-forecasting"
+  artifact_location: "s3://${S3_BUCKET_NAME}/mlflow/"
+
+  # Logging settings
+  log_models: true
+  log_input_examples: true
+  log_model_signatures: true
+
+# =============================================================================
+# Airflow Configuration
+# =============================================================================
+airflow:
+  # DAG default arguments
+  default_args:
+    owner: "scalecast"
+    depends_on_past: false
+    email_on_failure: false
+    email_on_retry: false
+    retries: 1
+    retry_delay_minutes: 5
+
+  # Schedule intervals
+  schedules:
+    data_ingestion: "0 2 * * *"      # Daily at 2 AM
+    model_training: "0 4 * * 0"       # Weekly on Sunday at 4 AM
+    model_evaluation: "0 5 * * *"     # Daily at 5 AM
+
+# =============================================================================
+# Data Validation Configuration
+# =============================================================================
+validation:
+  # Great Expectations settings
+  expectations_store: "data/expectations"
+  validations_store: "data/validations"
+
+  # Data quality thresholds
+  thresholds:
+    null_percentage_max: 0.05
+    duplicate_percentage_max: 0.01
+    min_rows: 100
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # Log file settings
+  file:
+    enabled: true
+    path: "logs/scalecast.log"
+    max_bytes: 10485760  # 10 MB
+    backup_count: 5

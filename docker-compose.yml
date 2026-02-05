@@ -1,0 +1,50 @@
+# =============================================================================
+# ScaleCast Docker Compose Configuration
+# =============================================================================
+# PostgreSQL Database Service
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # PostgreSQL Database
+  # ===========================================================================
+  # Primary database for ScaleCast application
+  # ===========================================================================
+  postgres:
+    # PostgreSQL version 15 - stable release with good performance
+    image: postgres:15
+
+    # Custom container name for easy identification
+    container_name: scalecast_postgres
+
+    # Environment variables loaded from .env file
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    # Port mapping: host:container
+    ports:
+      - "5432:5432"
+
+    # Persistent volume for database data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Health check to verify database is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    # Restart policy - restart unless manually stopped
+    restart: unless-stopped
+
+# =============================================================================
+# Volumes
+# =============================================================================
+# Named volumes for data persistence
+# =============================================================================
+volumes:
+  postgres_data:

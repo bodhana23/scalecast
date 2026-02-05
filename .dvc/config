@@ -1,0 +1,5 @@
+[core]
+    remote = s3remote
+['remote "s3remote"']
+    url = s3://scalecast-mlops-bodhana-2026/dvc
+    region = ap-southeast-1
