@@ -1,69 +1,127 @@
-# ScaleCast
+<h1 align="center">🚀 ScaleCast</h1>
 
-**End-to-end MLOps pipeline for demand forecasting**
+<p align="center">
+  <strong>End-to-End MLOps Pipeline for Demand Forecasting</strong>
+</p>
 
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Apache Airflow](https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apache-airflow&logoColor=white)
-![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apache-airflow&logoColor=white" alt="Airflow" />
+  <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="GitHub Actions" />
+</p>
 
 ---
 
-## Architecture
+## 📐 Architecture
 
-<!-- TODO: Add architecture diagram -->
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           ScaleCast Architecture                         │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐         │
-│   │   S3     │───▶│ Airflow  │───▶│ Training │───▶│  MLflow  │         │
-│   │  (Data)  │    │  (DAGs)  │    │ Pipeline │    │ (Track)  │         │
-│   └──────────┘    └──────────┘    └──────────┘    └──────────┘         │
-│        │                                               │                │
-│        │              ┌──────────────┐                 │                │
-│        └─────────────▶│  PostgreSQL  │◀────────────────┘                │
-│                       │  (Warehouse) │                                  │
-│                       └──────────────┘                                  │
-│                              │                                          │
-│                       ┌──────────────┐                                  │
-│                       │   FastAPI    │                                  │
-│                       │  (Serving)   │                                  │
-│                       └──────────────┘                                  │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          ScaleCast MLOps Pipeline                               │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│   ┌─────────┐      ┌─────────────────┐      ┌────────────┐      ┌─────────┐   │
+│   │   S3    │─────▶│      Great      │─────▶│ PostgreSQL │─────▶│   ML    │   │
+│   │  (raw)  │      │  Expectations   │      │ (warehouse)│      │Training │   │
+│   └─────────┘      │  (validation)   │      └────────────┘      └────┬────┘   │
+│                    └─────────────────┘                               │        │
+│                            │                                         ▼        │
+│                            │ ❌ Circuit                        ┌─────────┐    │
+│                            │    Breaker                        │   S3    │    │
+│                            ▼                                   │(models) │    │
+│                    ┌───────────────┐                           └────┬────┘    │
+│                    │  Alert/Stop   │                                │         │
+│                    │   Pipeline    │                                ▼         │
+│                    └───────────────┘                          ┌─────────┐     │
+│                                                               │ FastAPI │     │
+│                                                               │(serving)│     │
+│                                                               └─────────┘     │
+│                                                                                 │
+│                    ┌─────────────────────────────────────┐                     │
+│                    │         Apache Airflow              │                     │
+│                    │      (Orchestration Layer)          │                     │
+│                    └─────────────────────────────────────┘                     │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Tech Stack
+---
+
+## ✨ Key Features
+
+- 🛡️ **Automated Data Validation** — Circuit breaker pattern stops pipeline on bad data
+- 📦 **Data Versioning** — Track datasets with DVC for reproducibility
+- ⚙️ **Workflow Orchestration** — Apache Airflow schedules and monitors pipelines
+- 🌐 **Model Serving** — FastAPI provides low-latency prediction endpoints
+- 🔄 **CI/CD Pipeline** — GitHub Actions for linting, testing, and Docker builds
+- 🐳 **Infrastructure as Code** — Fully containerized with Docker Compose
+
+---
+
+## 🛠️ Tech Stack
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| Orchestration | Apache Airflow 2.7 | Workflow scheduling and monitoring |
-| ML Tracking | MLflow 2.9 | Experiment tracking and model registry |
-| API | FastAPI 0.104 | Model serving and predictions |
-| Database | PostgreSQL 15 | Data warehouse and metadata store |
-| Data Validation | Great Expectations | Data quality checks |
-| Version Control | DVC | Data and model versioning |
-| Cloud Storage | AWS S3 | Artifact and data storage |
-| Containerization | Docker Compose | Local development environment |
+| **Orchestration** | Apache Airflow 2.7 | Workflow scheduling and monitoring |
+| **Data Validation** | Great Expectations | Schema and quality checks |
+| **Database** | PostgreSQL 15 | Data warehouse for training data |
+| **ML Framework** | scikit-learn | Random Forest demand forecasting |
+| **API** | FastAPI 0.104 | Model serving with auto-generated docs |
+| **Cloud Storage** | AWS S3 | Artifact and model storage |
+| **Version Control** | DVC 3.30 | Data and model versioning |
+| **CI/CD** | GitHub Actions | Automated testing and builds |
+| **Containerization** | Docker Compose | Local development environment |
 
-## Prerequisites
+---
 
-- **Docker** >= 20.10
-- **Docker Compose** >= 2.0
-- **Python** >= 3.10 (for local development)
-- **AWS Account** with S3 access
+## 📁 Project Structure
 
-## Quick Start
+```
+scalecast/
+├── 📂 airflow/
+│   ├── dags/                   # Airflow DAG definitions
+│   │   └── scalecast_pipeline.py
+│   ├── logs/                   # Airflow logs (gitignored)
+│   └── plugins/                # Custom Airflow plugins
+├── 📂 configs/
+│   └── config.yaml             # Central configuration
+├── 📂 data/
+│   ├── raw/                    # Raw input data (DVC tracked)
+│   └── processed/              # Processed datasets
+├── 📂 models/                  # Trained model artifacts
+├── 📂 scripts/
+│   ├── setup_aws.py            # AWS S3 bucket setup
+│   ├── generate_keys.py        # Generate Fernet keys
+│   └── init_db.sql             # Database schema initialization
+├── 📂 src/
+│   ├── api/                    # FastAPI application
+│   │   └── main.py
+│   ├── data_ingestion/         # Data loading utilities
+│   ├── data_validation/        # Great Expectations checks
+│   │   └── validate_demand_data.py
+│   └── training/               # Model training pipeline
+├── 📂 tests/                   # Test suite
+│   └── test_validation.py
+├── 📂 .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI pipeline
+├── docker-compose.yml          # Docker services definition
+├── Dockerfile.airflow          # Airflow container
+├── Dockerfile.api              # FastAPI container
+├── requirements.txt            # Python dependencies
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/scalecast.git
+git clone https://github.com/yourusername/scalecast.git
 cd scalecast
 ```
 
@@ -73,172 +131,159 @@ cd scalecast
 # Copy the example environment file
 cp .env.example .env
 
-# Edit .env with your credentials
-# Required: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, etc.
+# Edit .env with your configuration
 ```
 
-### 3. Set Up AWS Resources
+### 3. Add AWS Credentials
+
+Add these to your `.env` file:
 
 ```bash
-# Install dependencies (if running locally)
-pip install boto3 python-dotenv
-
-# Run AWS setup script
-python scripts/setup_aws.py
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=your-bucket-name
 ```
 
 ### 4. Start Services
 
 ```bash
-# Start all services (PostgreSQL, Airflow, MLflow)
+# Start all services (PostgreSQL, Airflow Webserver, Scheduler)
 docker-compose up -d
 
 # Check service status
 docker-compose ps
 ```
 
-### 5. Access UIs
+### 5. Access Airflow UI
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Airflow | http://localhost:8080 | admin / admin |
-| MLflow | http://localhost:5000 | - |
-| API | http://localhost:8000 | - |
-| API Docs | http://localhost:8000/docs | - |
+Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-## Project Structure
+| Field | Value |
+|-------|-------|
+| Username | `admin` |
+| Password | `admin` |
+
+### 6. Trigger the Pipeline
+
+1. Navigate to **DAGs** in the Airflow UI
+2. Find `scalecast_demand_pipeline`
+3. Toggle the DAG to **On**
+4. Click the **Play** button to trigger manually
+
+---
+
+## 📊 Pipeline Overview
+
+The `scalecast_demand_pipeline` DAG executes four sequential tasks:
+
+| Task | Description |
+|------|-------------|
+| **validate_data** | Validates raw CSV against schema and business rules. Implements circuit breaker — pipeline stops if validation fails. |
+| **load_to_postgres** | Loads validated data into `warehouse.demand_data` table. Truncates existing data before insert. |
+| **train_model** | Trains Random Forest regressor with feature engineering (day of week, month, weekend flag). Outputs MAE, RMSE, R² metrics. |
+| **upload_model** | Uploads `demand_model.pkl` and `encoders.pkl` to S3 for model serving. |
 
 ```
-scalecast/
-├── airflow/
-│   ├── dags/              # Airflow DAG definitions
-│   ├── logs/              # Airflow logs (gitignored)
-│   └── plugins/           # Custom Airflow plugins
-├── configs/
-│   └── config.yaml        # Central configuration
-├── data/
-│   ├── raw/               # Raw input data (gitignored)
-│   └── processed/         # Processed datasets (gitignored)
-├── models/                # Trained model artifacts (gitignored)
-├── scripts/
-│   ├── setup_aws.py       # AWS S3 setup script
-│   └── init_db.sql        # Database initialization
-├── src/
-│   ├── api/               # FastAPI application
-│   ├── data_ingestion/    # Data loading utilities
-│   ├── data_validation/   # Great Expectations checks
-│   └── training/          # Model training pipeline
-├── tests/                 # Test suite
-├── docker-compose.yml     # Docker services definition
-├── Dockerfile.api         # FastAPI container
-├── requirements.txt       # Python dependencies
-└── README.md
+validate_data  ──▶  load_to_postgres  ──▶  train_model  ──▶  upload_model
 ```
 
-## Configuration
+---
 
-All configuration is centralized in `configs/config.yaml`:
+## 🔌 API Usage
 
-```yaml
-# Key configuration sections
-data:
-  raw_path: "data/raw"
-  s3_bucket: "${S3_BUCKET_NAME}"
+### Health Check
 
-model:
-  name: "demand_forecaster"
-  features: [...]
-  target: "demand"
-
-api:
-  host: "0.0.0.0"
-  port: 8000
+```bash
+curl http://localhost:8000/health
 ```
 
-Environment variables can override config values using `${VAR_NAME}` syntax.
+**Response:**
+```json
+{
+  "status": "healthy",
+  "model_loaded": true
+}
+```
 
-## Development
+### Make a Prediction
 
-### Local Setup
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "date": "2024-03-15",
+    "store_id": "STORE_001",
+    "product_id": "PROD_A",
+    "price": 29.99,
+    "promotion": true
+  }'
+```
+
+**Response:**
+```json
+{
+  "prediction": 142.5,
+  "model_version": "1.0.0"
+}
+```
+
+### API Documentation
+
+Interactive Swagger docs available at [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+## 🧪 Running Tests
 
 ```bash
 # Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Unix
-# .venv\Scripts\activate   # Windows
+python -m venv venv
+source venv/bin/activate  # Unix/macOS
+# venv\Scripts\activate   # Windows
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run tests
+# Run tests with verbose output
 pytest tests/ -v
 ```
 
-### Running Individual Services
-
-```bash
-# Start only PostgreSQL and MLflow
-docker-compose up -d postgres mlflow
-
-# Start API locally
-uvicorn src.api.main:app --reload --port 8000
+**Expected output:**
 ```
-
-## Useful Commands
-
-```bash
-# View logs
-docker-compose logs -f airflow-webserver
-docker-compose logs -f mlflow
-
-# Stop all services
-docker-compose down
-
-# Remove all data (volumes)
-docker-compose down -v
-
-# Rebuild containers
-docker-compose build --no-cache
-
-# Access PostgreSQL
-docker exec -it scalecast-postgres psql -U scalecast -d scalecast
+tests/test_validation.py::test_validation_passes_with_valid_data PASSED
+tests/test_validation.py::test_validation_fails_with_missing_column PASSED
+tests/test_validation.py::test_validation_fails_with_null_values PASSED
 ```
-
-## Troubleshooting
-
-### Airflow webserver not starting
-```bash
-# Check logs
-docker-compose logs airflow-init
-docker-compose logs airflow-webserver
-
-# Reset Airflow
-docker-compose down
-docker volume rm scalecast-postgres-data
-docker-compose up -d
-```
-
-### MLflow connection issues
-```bash
-# Verify AWS credentials
-python scripts/setup_aws.py
-
-# Check MLflow logs
-docker-compose logs mlflow
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**ScaleCast** - Built for scalable demand forecasting
+## 📚 What I Learned
+
+Building ScaleCast provided hands-on experience with key MLOps concepts:
+
+- 🔄 **Pipeline Orchestration** — Designing DAGs with proper task dependencies and failure handling using Airflow's PythonOperator
+- 🛡️ **Data Quality Gates** — Implementing validation as a circuit breaker that prevents bad data from corrupting models
+- 📦 **Containerized ML Workflows** — Structuring Docker services for reproducible local development that mirrors production
+- 🚀 **API-First Model Serving** — Building REST endpoints with proper error handling, schema validation, and health checks
+
+---
+
+## 🔮 Future Improvements
+
+- 📈 **MLflow Integration** — Add experiment tracking and model registry for A/B testing
+- ⚡ **Feature Store** — Implement Feast for online/offline feature consistency
+- 🔔 **Alerting** — Add Slack/email notifications for pipeline failures via Airflow callbacks
+- ☸️ **Kubernetes Deployment** — Migrate from Docker Compose to Helm charts for production scaling
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  <strong>ScaleCast</strong> — Built for scalable demand forecasting 📊
+</p>
