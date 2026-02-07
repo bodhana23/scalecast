@@ -258,23 +258,23 @@ tests/test_validation.py::test_validation_fails_with_null_values PASSED
 
 ---
 
-## 📚 What I Learned
+## 🧩 Core Engineering Challenges Addressed
 
-Building ScaleCast provided hands-on experience with key MLOps concepts:
-
-- 🔄 **Pipeline Orchestration** — Designing DAGs with proper task dependencies and failure handling using Airflow's PythonOperator
-- 🛡️ **Data Quality Gates** — Implementing validation as a circuit breaker that prevents bad data from corrupting models
-- 📦 **Containerized ML Workflows** — Structuring Docker services for reproducible local development that mirrors production
-- 🚀 **API-First Model Serving** — Building REST endpoints with proper error handling, schema validation, and health checks
+| Challenge | Solution |
+|-----------|----------|
+| **Reproducibility** | DVC links trained models to exact training data versions, enabling rollback and audit |
+| **Data Quality** | Great Expectations acts as a circuit breaker — bad data stops the pipeline before corrupting models |
+| **Decoupling** | S3 serves as middleware between training and serving, allowing independent scaling |
+| **Automation** | Airflow orchestrates the entire pipeline with scheduling, retries, and dependency management |
 
 ---
 
 ## 🔮 Future Improvements
 
-- 📈 **MLflow Integration** — Add experiment tracking and model registry for A/B testing
-- ⚡ **Feature Store** — Implement Feast for online/offline feature consistency
-- 🔔 **Alerting** — Add Slack/email notifications for pipeline failures via Airflow callbacks
-- ☸️ **Kubernetes Deployment** — Migrate from Docker Compose to Helm charts for production scaling
+- 📈 **MLflow Integration** — Add experiment tracking and model registry
+- 🔬 **Model A/B Testing** — Implement traffic splitting for model comparison
+- 📊 **Grafana Dashboards** — Add monitoring for pipeline metrics and model performance
+- ☸️ **AWS ECS/EKS Deployment** — Migrate to managed container orchestration for production
 
 ---
 
