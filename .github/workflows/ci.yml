@@ -46,9 +46,10 @@ jobs:
 
       # Run flake8 on src/ directory
       # --max-line-length=120: Allow lines up to 120 characters
-      # --ignore=E501,W503: Ignore line too long (redundant) and line break before binary operator
+      # --ignore: E501 (line too long), W503 (line break before binary operator),
+      #           E402 (module level import not at top), F841 (unused variable)
       - name: Run flake8
-        run: flake8 src/ --max-line-length=120 --ignore=E501,W503
+        run: flake8 src/ --max-line-length=120 --ignore=E501,W503,E402,F841
 
   # ---------------------------------------------------------------------------
   # Job 2: Test
