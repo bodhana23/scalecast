@@ -49,6 +49,60 @@
 
 ---
 
+## ML Model Details
+
+### Feature Engineering
+
+We engineered 16 features for demand forecasting:
+
+| Category | Features | Description |
+|----------|----------|-------------|
+| Temporal | day_of_week, month, week_of_year | Capture seasonal patterns |
+| Boolean | is_weekend, is_month_start, is_month_end | Special day indicators |
+| Lag | lag_1, lag_7, lag_14 | Historical sales (1 day, 1 week, 2 weeks ago) |
+| Rolling | rolling_mean_7, rolling_std_7, rolling_mean_14 | Trend and volatility |
+| Numeric | price, promotion | Business factors |
+| Categorical | store_id_encoded, product_id_encoded | Location and product identity |
+
+### Model Comparison
+
+We compared 6 models including traditional ML and deep learning:
+
+| Model | Type | MAE | RMSE | MAPE | R² | Notes |
+|-------|------|-----|------|------|-----|-------|
+| Naive Baseline | Baseline | 115.06 | 322.69 | 382.9% | -0.975 | Uses yesterday's sales |
+| Mean Baseline | Baseline | 97.96 | 237.91 | 405.4% | -0.074 | Uses 7-day rolling mean |
+| Linear Regression | Traditional ML | 92.47 | 227.20 | 436.7% | 0.021 | Simple linear model |
+| Random Forest | Traditional ML | 81.15 | 226.00 | 332.6% | 0.031 | Tuned with GridSearchCV |
+| XGBoost | Gradient Boosting | **79.38** | 244.07 | **270.6%** | -0.130 | **Best model** |
+| PyTorch NN | Deep Learning | 90.88 | 226.62 | 424.3% | 0.026 | Custom training loop |
+
+### Why XGBoost Won
+
+1. **Tabular data favors tree-based models** — Neural networks excel at unstructured data (images, text), but XGBoost handles tabular features better
+2. **Feature interactions** — XGBoost automatically captures non-linear relationships between features
+3. **31% improvement over baseline** — Significant reduction in prediction error
+
+### Top Predictive Features
+
+| Rank | Feature | Importance | Why It Matters |
+|------|---------|------------|----------------|
+| 1 | price | 0.195 | Price elasticity affects demand |
+| 2 | rolling_std_7 | 0.132 | Sales volatility indicates predictability |
+| 3 | month | 0.096 | Strong seasonal patterns |
+| 4 | lag_7 | 0.090 | Weekly purchase cycles |
+| 5 | lag_14 | 0.082 | Bi-weekly patterns |
+
+### PyTorch Implementation
+
+We included a PyTorch neural network to demonstrate deep learning skills:
+
+- **Architecture**: Input(16) → Dense(64) → ReLU → Dropout(0.2) → Dense(32) → ReLU → Dropout(0.2) → Output(1)
+- **Training**: 100 epochs, Adam optimizer, MSE loss, batch size 32
+- **Result**: 21% improvement over baseline (competitive but XGBoost was better for this dataset)
+
+---
+
 ## ✨ Key Features
 
 - 🛡️ **Automated Data Validation** — Circuit breaker pattern stops pipeline on bad data
@@ -67,7 +121,7 @@
 | **Orchestration** | Apache Airflow 2.7 | Workflow scheduling and monitoring |
 | **Data Validation** | Great Expectations | Schema and quality checks |
 | **Database** | PostgreSQL 15 | Data warehouse for training data |
-| **ML Framework** | scikit-learn | Random Forest demand forecasting |
+| **ML Framework** | scikit-learn, XGBoost, PyTorch | Model comparison pipeline (6 models) |
 | **API** | FastAPI 0.104 | Model serving with auto-generated docs |
 | **Cloud Storage** | AWS S3 | Artifact and model storage |
 | **Version Control** | DVC 3.30 | Data and model versioning |
@@ -181,7 +235,7 @@ The `scalecast_demand_pipeline` DAG executes four sequential tasks:
 |------|-------------|
 | **validate_data** | Validates raw CSV against schema and business rules. Implements circuit breaker — pipeline stops if validation fails. |
 | **load_to_postgres** | Loads validated data into `warehouse.demand_data` table. Truncates existing data before insert. |
-| **train_model** | Trains Random Forest regressor with feature engineering (day of week, month, weekend flag). Outputs MAE, RMSE, R² metrics. |
+| **train_model** | Compares 6 models (baselines, Linear Regression, Random Forest, XGBoost, PyTorch NN) with 16 engineered features. Selects best model by MAE. |
 | **upload_model** | Uploads `demand_model.pkl` and `encoders.pkl` to S3 for model serving. |
 
 ```
@@ -266,6 +320,17 @@ tests/test_validation.py::test_validation_fails_with_null_values PASSED
 | **Data Quality** | Great Expectations acts as a circuit breaker — bad data stops the pipeline before corrupting models |
 | **Decoupling** | S3 serves as middleware between training and serving, allowing independent scaling |
 | **Automation** | Airflow orchestrates the entire pipeline with scheduling, retries, and dependency management |
+
+---
+
+## Technical Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| XGBoost over Neural Network | Tabular data with engineered features favors gradient boosting |
+| Lag features (1, 7, 14 days) | Captures daily, weekly, and bi-weekly purchase patterns |
+| GridSearchCV with cv=3 | Balance between thorough tuning and computation time |
+| StandardScaler for PyTorch only | Tree-based models don't require feature scaling |
 
 ---
 
